@@ -47,7 +47,7 @@ export function initPlusGrid(canvas: HTMLCanvasElement) {
       const arm = ARM + t * 3;
       ctx!.strokeStyle =
         t > 0.02
-          ? `rgba(198, 255, 74, ${0.1 + t * 0.65})`
+          ? `rgba(94, 234, 212, ${0.1 + t * 0.65})`
           : 'rgba(242, 242, 239, 0.09)';
       ctx!.beginPath();
       ctx!.moveTo(p.x - arm, p.y);
