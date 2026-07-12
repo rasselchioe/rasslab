@@ -1,0 +1,82 @@
+---
+const roles = [
+  {
+    time: 'Sept 2024 — Present',
+    org: 'PPI Liverpool',
+    role: 'Finance Team Member',
+    desc: 'Budgets, demand forecasts and risk assessments for social and sports events — expense tracking, reimbursements and break-even pricing set with departmental teams.',
+  },
+  {
+    time: 'July 2022 — Aug 2024',
+    org: 'ILUMINEN, Bali',
+    role: 'Assistant Photography Intern',
+    desc: 'Supported full event coverage — lighting, monitor and gimbal setups — and organised client deliverables with data integrity and on-time delivery.',
+  },
+  {
+    time: 'Dec 2022',
+    org: 'Murni Cosmetics, Bali',
+    role: 'Information Technology Intern',
+    desc: 'Collected and analysed sales data across e-commerce platforms and the point-of-sale system to spot trending products and support forecasting and inventory planning.',
+  },
+  {
+    time: 'July 2022 — June 2023',
+    org: 'Regents Secondary School, Bali',
+    role: 'Production House Documentation Team',
+    desc: 'Ran event documentation and Instagram content reports for the student union, keeping branding consistent across departments under tight deadlines.',
+  },
+];
+
+const education = {
+  time: '2024 — 2028',
+  org: 'University of Liverpool',
+  role: 'BSc Computer Science (Year in Industry)',
+  desc: 'Cybersecurity specialism — first-class Year 1 average (~74%), expected graduation June 2028. Currently studying Cyber Security, Complexity of Algorithms and the Group Software Project.',
+};
+---
+
+<section id="experience" class="px-5 pb-28 md:px-10 md:pb-44">
+  <h2 class="mb-6 font-mono text-xs tracking-[0.18em] text-muted uppercase">
+    <span class="text-accent">(03)</span> Experience
+  </h2>
+
+  <ol class="border-t border-white/10">
+    {
+      roles.map((r) => (
+        <li class="grid gap-2 border-b border-white/10 py-6 md:grid-cols-12 md:gap-6 md:py-8" data-fade>
+          <p class="font-mono text-xs tracking-[0.14em] text-muted uppercase md:col-span-3 md:pt-1.5">{r.time}</p>
+          <div class="md:col-span-9">
+            <h3 class="font-display text-xl leading-tight font-bold tracking-tight uppercase md:text-2xl">{r.role}</h3>
+            <p class="mt-1 font-mono text-xs tracking-[0.14em] text-accent uppercase">{r.org}</p>
+            <p class="mt-3 max-w-2xl leading-relaxed text-muted">{r.desc}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <h3 class="mt-14 mb-6 font-mono text-xs tracking-[0.18em] text-muted uppercase">
+    <span class="text-accent">(+)</span> Education
+  </h3>
+
+  <div class="grid gap-2 border-t border-b border-white/10 py-6 md:grid-cols-12 md:gap-6 md:py-8" data-fade>
+    <p class="font-mono text-xs tracking-[0.14em] text-muted uppercase md:col-span-3 md:pt-1.5">{education.time}</p>
+    <div class="md:col-span-9">
+      <h3 class="font-display text-xl leading-tight font-bold tracking-tight uppercase md:text-2xl">
+        {education.role}
+      </h3>
+      <p class="mt-1 font-mono text-xs tracking-[0.14em] text-accent uppercase">{education.org}</p>
+      <p class="mt-3 max-w-2xl leading-relaxed text-muted">{education.desc}</p>
+    </div>
+  </div>
+
+  <p data-fade class="mt-8">
+    <a
+      href="/cv.pdf"
+      target="_blank"
+      rel="noopener"
+      class="link-hover font-mono text-[11px] tracking-[0.14em] uppercase md:text-xs"
+    >
+      Full CV (PDF)&nbsp;↗
+    </a>
+  </p>
+</section>
