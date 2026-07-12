@@ -1,0 +1,111 @@
+---
+type Project = {
+  n: string;
+  title: string;
+  sub: string;
+  desc: string;
+  tags: string[];
+  links: { label: string; href: string }[];
+  note?: string;
+};
+
+const projects: Project[] = [
+  {
+    n: '01',
+    title: 'Stash',
+    sub: 'A personal finance tracker',
+    desc: 'Track income and expenses, set monthly budgets and savings goals, and see where your money goes with clean analytics. Handles multiple currencies with live exchange rates, and reads bank-statement CSVs to auto-detect recurring charges and frequent stores — kept honest by 44 Playwright end-to-end tests.',
+    tags: [
+      'React',
+      'TypeScript',
+      'Vite',
+      'Tailwind CSS',
+      'Chart.js',
+      'Node',
+      'Express',
+      'Prisma',
+      'SQLite',
+      'JWT auth',
+      'Playwright',
+    ],
+    links: [
+      { label: 'Live', href: 'https://stash.rasslab.dev' },
+      { label: 'GitHub', href: 'https://github.com/rasselchioe/spending-tracker' },
+    ],
+  },
+  {
+    n: '02',
+    title: 'Kadence',
+    sub: 'Editorial cycling analytics for one rider',
+    desc: 'A private, single-user GPX archive — a from-scratch parser computes distance, elevation, Normalized Power, per-kilometre splits and FIETS-style climb categories, rendered as an editorial dashboard where the MapLibre map and speed, heart-rate and power charts share one cursor. An archive, not a network.',
+    tags: ['Next.js 15', 'TypeScript', 'Tailwind', 'MapLibre', 'Recharts', 'PostgreSQL', 'GPX parsing', 'Unit tests'],
+    links: [{ label: 'GitHub', href: 'https://github.com/rasselchioe/kadence' }],
+  },
+  {
+    n: '03',
+    title: 'Photography Portfolio',
+    sub: 'A cinematic photography exhibition',
+    desc: 'A cinematic, exhibition-style photography portfolio with editorial motion — GSAP and Lenis-driven scenes, static export, and Cloudflare R2-ready images.',
+    tags: ['Next.js 15', 'TypeScript', 'Tailwind v4', 'Framer Motion', 'GSAP', 'Lenis', 'Cloudflare R2'],
+    links: [],
+    note: 'private repo',
+  },
+  {
+    n: '04',
+    title: 'Password Strength Auditor',
+    sub: 'Static analyser + cracking simulator',
+    desc: 'Scores passwords across length, charset variety, keyboard walks, dictionary hits, entropy and HIBP k-anonymity — then proves the score empirically by cracking weak examples with dictionary, rule-mutation and bounded brute-force attacks over MD5, SHA and bcrypt, with timings.',
+    tags: ['Python', 'Entropy estimation', 'HIBP k-anonymity', 'bcrypt vs MD5/SHA', 'Dictionary attacks', 'CLI'],
+    links: [{ label: 'GitHub', href: 'https://github.com/rasselchioe/password-strength-auditor' }],
+  },
+];
+---
+
+<section id="work" class="px-5 pb-28 md:px-10 md:pb-44">
+  <h2 class="mb-6 font-mono text-xs tracking-[0.18em] text-muted uppercase">
+    <span class="text-accent">(02)</span> Selected Work
+  </h2>
+
+  <ul class="border-t border-white/10">
+    {
+      projects.map((p) => (
+        <li class="border-b border-white/10" data-fade>
+          <div class="py-8 md:py-10">
+            <div class="flex flex-wrap items-baseline gap-x-4 gap-y-3 md:gap-x-8">
+              <span class="font-mono text-sm text-accent">({p.n})</span>
+              {p.links.length > 0 ? (
+                <a href={p.links[0].href} target="_blank" rel="noopener" class="group">
+                  <span class="font-display block text-[1.65rem] leading-none font-bold tracking-tight uppercase transition-[color,translate] duration-300 group-hover:translate-x-2 group-hover:text-accent md:text-6xl">
+                    {p.title}
+                  </span>
+                </a>
+              ) : (
+                <span class="font-display text-[1.65rem] leading-none font-bold tracking-tight uppercase md:text-6xl">
+                  {p.title}
+                </span>
+              )}
+              <span class="ml-auto flex gap-5 font-mono text-[11px] tracking-[0.14em] uppercase md:text-xs">
+                {p.links.map((l) => (
+                  <a class="link-hover" href={l.href} target="_blank" rel="noopener">
+                    {l.label}&nbsp;↗
+                  </a>
+                ))}
+                {p.note && <span class="text-muted">({p.note})</span>}
+              </span>
+            </div>
+
+            <div class="mt-5 max-w-3xl md:pl-[4.5rem]">
+              <p class="mb-3 font-mono text-xs tracking-[0.14em] text-muted uppercase">{p.sub}</p>
+              <p class="mb-5 leading-relaxed text-muted">{p.desc}</p>
+              <ul class="flex flex-wrap gap-2">
+                {p.tags.map((t) => (
+                  <li class="rounded-full border border-white/15 px-3.5 py-1.5 font-mono text-xs text-ink/80">{t}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</section>

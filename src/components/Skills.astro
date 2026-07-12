@@ -1,0 +1,107 @@
+---
+const skills = [
+  {
+    n: '01',
+    title: 'Cybersecurity',
+    blurb:
+      'Security is the lens for everything I build — proven on my Password Strength Auditor, from entropy estimation to a hash-cracking simulator.',
+    tags: [
+      'Password auditing',
+      'Hashing & salting (bcrypt vs MD5/SHA)',
+      'Entropy estimation',
+      'HIBP k-anonymity',
+      'Secure authentication (JWT, httpOnly cookies)',
+    ],
+  },
+  {
+    n: '02',
+    title: 'Software Testing',
+    blurb:
+      'Black-box first: I specify the behaviour, then attack the implementation. 44 Playwright end-to-end tests keep Stash honest.',
+    tags: ['Playwright', 'pytest', 'JUnit', 'Unit testing', 'End-to-end testing', 'Black-box testing'],
+  },
+  {
+    n: '03',
+    title: 'Full-Stack Development',
+    blurb: 'From schema to UI: typed APIs, React front ends, and AI-assisted implementation with Claude Code.',
+    tags: [
+      'Python',
+      'Java',
+      'TypeScript',
+      'JavaScript',
+      'SQL',
+      'Haskell',
+      'React',
+      'Node.js / Express',
+      'Prisma',
+      'Tailwind',
+      'REST APIs',
+      'HTML/CSS',
+      'Git & GitHub',
+      'Linux',
+      'Cloudflare',
+      'SQLite',
+    ],
+  },
+];
+---
+
+<section id="skills" class="px-5 pb-28 md:px-10 md:pb-44">
+  <h2 class="mb-6 font-mono text-xs tracking-[0.18em] text-muted uppercase">
+    <span class="text-accent">(+)</span> Capabilities
+  </h2>
+
+  <ul class="border-t border-white/10">
+    {
+      skills.map((s, idx) => (
+        <li class:list={['border-b border-white/10', { 'acc-open': idx === 0 }]} data-fade>
+          <h3>
+            <button
+              type="button"
+              class="group flex w-full items-baseline gap-4 py-6 text-left md:gap-8 md:py-9"
+              aria-expanded={idx === 0 ? 'true' : 'false'}
+              aria-controls={`skill-panel-${s.n}`}
+              data-acc
+            >
+              <span class="font-mono text-sm text-accent">({s.n})</span>
+              <span class="font-display text-[1.65rem] leading-none font-bold tracking-tight uppercase transition-[color,translate] duration-300 group-hover:translate-x-2 group-hover:text-accent md:text-6xl">
+                {s.title}
+              </span>
+              <span
+                class="acc-icon font-display ml-auto text-2xl leading-none text-muted transition-transform duration-300 md:text-4xl"
+                aria-hidden="true"
+              >
+                +
+              </span>
+            </button>
+          </h3>
+          <div id={`skill-panel-${s.n}`} class="acc-panel">
+            <div class="acc-inner">
+              <div class="max-w-3xl pb-8 md:pb-10 md:pl-[4.5rem]">
+                <p class="mb-5 leading-relaxed text-muted">{s.blurb}</p>
+                <ul class="flex flex-wrap gap-2">
+                  {s.tags.map((t) => (
+                    <li class="rounded-full border border-white/15 px-3.5 py-1.5 font-mono text-xs text-ink/80">{t}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-acc]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('li');
+      if (!row) return;
+      const open = row.classList.toggle('acc-open');
+      btn.setAttribute('aria-expanded', String(open));
+      // Page height changed — let ScrollTrigger re-measure its reveal positions.
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 500);
+    });
+  });
+</script>

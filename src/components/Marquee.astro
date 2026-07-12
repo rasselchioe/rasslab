@@ -1,0 +1,26 @@
+---
+interface Props {
+  items: string[];
+  class?: string;
+  /** Seconds for one full loop. */
+  duration?: number;
+}
+const { items, class: className, duration = 44 } = Astro.props;
+---
+
+<div class:list={['marquee', className]} aria-hidden="true" style={`--marquee-duration: ${duration}s`}>
+  <div class="marquee-track">
+    {
+      [0, 1].map(() => (
+        <span class="marquee-seg">
+          {items.map((item) => (
+            <span class="inline-flex items-center">
+              {item}
+              <span class="mx-5 text-accent">+</span>
+            </span>
+          ))}
+        </span>
+      ))
+    }
+  </div>
+</div>

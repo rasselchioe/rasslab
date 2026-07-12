@@ -1,0 +1,90 @@
+<div
+  id="preloader"
+  class="fixed inset-0 z-[999] flex-col justify-end bg-bg p-6 md:p-10"
+  aria-hidden="true"
+>
+  <div id="boot-log" class="font-mono text-sm leading-7 text-accent md:text-base"></div>
+</div>
+
+<script>
+  import gsap from 'gsap';
+
+  const el = document.getElementById('preloader');
+  const log = document.getElementById('boot-log');
+
+  const handOver = () => {
+    window.__rlBooted = true;
+    window.dispatchEvent(new CustomEvent('rl:booted'));
+  };
+
+  if (!el || !log || document.documentElement.dataset.boot !== 'play') {
+    // Repeat visit, reduced motion, or missing markup: no boot sequence.
+    el?.remove();
+    handOver();
+  } else {
+    try {
+      sessionStorage.setItem('rl-booted', '1');
+    } catch {
+      /* storage unavailable — boot will just replay next visit */
+    }
+
+    const LINES = [
+      '> init rasslab.dev',
+      '> loading modules: motion, work, contact ... ok',
+      '> access level: guest ✓',
+      '> rendering portfolio',
+    ];
+    let skipped = false;
+    let finished = false;
+
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    const addLine = () => {
+      const div = document.createElement('div');
+      div.className = 'boot-line';
+      log.appendChild(div);
+      return div;
+    };
+
+    const finish = (fast = false) => {
+      if (finished) return;
+      finished = true;
+      window.removeEventListener('keydown', skip);
+      handOver();
+      gsap.to(el, {
+        yPercent: -100,
+        duration: fast ? 0.45 : 0.7,
+        ease: 'power4.inOut',
+        onComplete: () => el.remove(),
+      });
+    };
+
+    const skip = () => {
+      if (skipped) return;
+      skipped = true;
+      log.textContent = '';
+      LINES.forEach((l) => (addLine().textContent = l));
+      finish(true);
+    };
+
+    (async () => {
+      for (const line of LINES) {
+        if (skipped) return;
+        const div = addLine();
+        for (const ch of line) {
+          if (skipped) return;
+          div.textContent += ch;
+          await wait(11);
+        }
+        await wait(110);
+      }
+      if (!skipped) {
+        await wait(320);
+        finish();
+      }
+    })();
+
+    el.addEventListener('click', skip);
+    window.addEventListener('keydown', skip);
+  }
+</script>

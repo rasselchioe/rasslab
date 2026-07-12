@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Preloader from '../components/Preloader.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Skills from '../components/Skills.astro';
+import Work from '../components/Work.astro';
+---
+
+<Base>
+  <Preloader />
+  <Header />
+  <main id="main">
+    <Hero />
+    <About />
+    <Skills />
+    <Work />
+
+    <!-- Placeholder: Experience & Contact land in the next steps. -->
+    <section class="flex min-h-[40vh] items-center px-5 py-32 md:px-10">
+      <p data-reveal class="max-w-md font-mono text-sm leading-7 text-muted">
+        (under construction — experience &amp; contact are on their way.)
+      </p>
+    </section>
+  </main>
+</Base>

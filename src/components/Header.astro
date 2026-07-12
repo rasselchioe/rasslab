@@ -1,0 +1,27 @@
+---
+const links = [
+  { n: '01', label: 'About', href: '#about' },
+  { n: '02', label: 'Work', href: '#work' },
+  { n: '03', label: 'Experience', href: '#experience' },
+  { n: '04', label: 'Contact', href: '#contact' },
+];
+---
+
+<header class="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-5 py-4 md:px-10 md:py-5">
+  <a href="#top" class="link-hover font-mono text-sm font-bold tracking-tight" aria-label="Back to top">
+    RL<span class="text-accent">/</span>
+  </a>
+  <nav aria-label="Primary">
+    <ul class="flex gap-4 font-mono text-[11px] uppercase tracking-[0.14em] sm:gap-6 md:gap-8 md:text-xs">
+      {
+        links.map(({ n, label, href }) => (
+          <li>
+            <a href={href} class="link-hover">
+              <span class="hidden text-accent sm:inline">({n})&nbsp;</span>{label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
