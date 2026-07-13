@@ -2,13 +2,12 @@
 interface Props {
   items: string[];
   class?: string;
-  /** Seconds for one full loop. */
-  duration?: number;
 }
-const { items, class: className, duration = 44 } = Astro.props;
+const { items, class: className } = Astro.props;
 ---
 
-<div class:list={['marquee', className]} aria-hidden="true" style={`--marquee-duration: ${duration}s`}>
+<!-- Loop speed lives in .marquee-track (CSP forbids inline styles). -->
+<div class:list={['marquee', className]} aria-hidden="true">
   <div class="marquee-track">
     {
       [0, 1].map(() => (

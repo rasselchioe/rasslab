@@ -2,6 +2,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
+import { initCursor } from './cursor';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -11,11 +12,19 @@ if (reduced) {
   document.documentElement.classList.add('motion');
   gsap.registerPlugin(ScrollTrigger, SplitText);
 
+  initCursor();
+
   // --- Lenis smooth scroll, driven by the GSAP ticker ---
   const lenis = new Lenis({ autoRaf: false });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
+
+  // The terminal locks page scroll while it's open.
+  window.addEventListener('rl:scroll-lock', (e) => {
+    if ((e as CustomEvent).detail) lenis.stop();
+    else lenis.start();
+  });
 
   // Anchor navigation goes through Lenis so it stays smooth.
   document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {

@@ -132,7 +132,7 @@ html[data-boot="play"] #preloader {
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+  animation: marquee-scroll 44s linear infinite;
 }
 .marquee:hover .marquee-track {
   animation-play-state: paused;
@@ -181,6 +181,74 @@ html[data-boot="play"] #preloader {
   border-radius: 9999px;
   background: var(--color-accent);
   animation: live-pulse 2s ease-in-out infinite;
+}
+
+/* ---------- custom cursor ---------- */
+
+html.custom-cursor,
+html.custom-cursor a,
+html.custom-cursor button,
+html.custom-cursor summary,
+html.custom-cursor label {
+  cursor: none;
+}
+html.custom-cursor input,
+html.custom-cursor textarea {
+  cursor: text;
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+.cursor-dot {
+  z-index: 1102;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+}
+.cursor-ring {
+  z-index: 1101;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(242, 242, 239, 0.35);
+  border-radius: 9999px;
+  transition:
+    width 0.3s cubic-bezier(0.65, 0, 0.35, 1),
+    height 0.3s cubic-bezier(0.65, 0, 0.35, 1),
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+.cursor-ring--hover {
+  width: 52px;
+  height: 52px;
+  border-color: var(--color-accent);
+}
+.cursor-ring--label {
+  width: auto;
+  height: auto;
+  padding: 0.5rem 0.9rem;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.cursor-label {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-bg);
+  white-space: nowrap;
+}
+.cursor-ring--label .cursor-label {
+  display: block;
 }
 
 /* ---------- reduced motion ---------- */

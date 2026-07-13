@@ -16,7 +16,7 @@ const links = [
       {
         links.map(({ n, label, href }) => (
           <li>
-            <a href={href} class="link-hover">
+            <a href={href} class="link-hover inline-block" data-magnetic>
               <span class="hidden text-accent sm:inline">({n})&nbsp;</span>{label}
             </a>
           </li>

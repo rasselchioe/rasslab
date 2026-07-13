@@ -1,0 +1,134 @@
+<div id="pwdemo" class="mt-6">
+  <button
+    type="button"
+    id="pwdemo-toggle"
+    aria-expanded="false"
+    aria-controls="pwdemo-panel"
+    class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-left font-mono text-xs tracking-[0.14em] uppercase"
+  >
+    <span class="acc-icon inline-block text-accent transition-transform duration-300" aria-hidden="true">+</span>
+    <span class="link-hover text-accent">Try it live</span>
+    <span class="text-muted normal-case">— runs entirely in your browser, nothing leaves this page</span>
+  </button>
+
+  <div id="pwdemo-panel" class="acc-panel">
+    <div class="acc-inner">
+      <div class="mt-5 max-w-xl border border-white/10 p-5">
+        <div class="flex items-center gap-3 border-b border-white/10 pb-3 font-mono text-sm">
+          <span class="text-accent" aria-hidden="true">&gt;</span>
+          <input
+            id="pw-input"
+            type="password"
+            placeholder="type a password to audit…"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            maxlength="128"
+            aria-label="Password to analyse (processed locally, never sent anywhere)"
+            class="min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-muted/60"
+          />
+          <button
+            type="button"
+            id="pw-show"
+            aria-pressed="false"
+            class="link-hover font-mono text-[11px] tracking-[0.14em] text-muted uppercase"
+          >
+            show
+          </button>
+        </div>
+
+        <div id="pw-result" class="hidden pt-4">
+          <div class="flex items-baseline justify-between gap-4 font-mono text-xs tracking-[0.14em] uppercase">
+            <span id="pw-verdict">—</span>
+            <span id="pw-bits" class="text-muted"></span>
+          </div>
+          <div class="mt-2 h-1 w-full bg-white/10">
+            <div id="pw-bar" class="h-full w-0 bg-accent transition-[width] duration-300"></div>
+          </div>
+          <ul id="pw-findings" class="mt-3 space-y-1 font-mono text-xs text-muted"></ul>
+          <dl id="pw-times" class="mt-4 space-y-1 border-t border-white/10 pt-3 font-mono text-xs"></dl>
+        </div>
+
+        <p class="mt-4 font-mono text-[11px] leading-relaxed text-muted/80">
+          Toy estimate for the demo — the full auditor adds HIBP k-anonymity checks and proves scores with a real
+          cracking simulator.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { analyze } from '../scripts/pwdemo';
+
+  const root = document.getElementById('pwdemo');
+  const toggle = document.getElementById('pwdemo-toggle');
+  const input = document.getElementById('pw-input') as HTMLInputElement | null;
+  const show = document.getElementById('pw-show');
+  const result = document.getElementById('pw-result');
+  const verdictEl = document.getElementById('pw-verdict');
+  const bitsEl = document.getElementById('pw-bits');
+  const bar = document.getElementById('pw-bar');
+  const findingsEl = document.getElementById('pw-findings');
+  const timesEl = document.getElementById('pw-times');
+
+  if (root && toggle && input && show && result && verdictEl && bitsEl && bar && findingsEl && timesEl) {
+    toggle.addEventListener('click', () => {
+      const open = root.classList.toggle('acc-open');
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) input.focus();
+    });
+
+    show.addEventListener('click', () => {
+      const visible = input.type === 'text';
+      input.type = visible ? 'password' : 'text';
+      show.textContent = visible ? 'show' : 'hide';
+      show.setAttribute('aria-pressed', String(!visible));
+      input.focus();
+    });
+
+    const VERDICT_CLASS: Record<string, string> = {
+      critical: 'text-red-400',
+      weak: 'text-red-400',
+      fair: 'text-ink',
+      strong: 'text-accent',
+      excellent: 'text-accent',
+    };
+
+    input.addEventListener('input', () => {
+      const pw = input.value;
+      if (!pw) {
+        result.classList.add('hidden');
+        return;
+      }
+      const r = analyze(pw);
+      result.classList.remove('hidden');
+
+      verdictEl.textContent = r.verdict;
+      verdictEl.className = VERDICT_CLASS[r.verdict] ?? 'text-ink';
+      bitsEl.textContent = `~${r.bits} bits · pool ${r.pool}`;
+      bar.style.width = `${Math.min(100, (r.bits / 90) * 100)}%`;
+
+      findingsEl.textContent = '';
+      for (const f of r.findings) {
+        const li = document.createElement('li');
+        li.textContent = `▸ ${f}`;
+        findingsEl.appendChild(li);
+      }
+
+      timesEl.textContent = '';
+      for (const t of r.times) {
+        const row = document.createElement('div');
+        row.className = 'flex items-baseline justify-between gap-4';
+        const dt = document.createElement('dt');
+        dt.className = 'text-muted';
+        dt.textContent = t.label;
+        const dd = document.createElement('dd');
+        dd.className = 'text-ink';
+        dd.textContent = t.value;
+        row.append(dt, dd);
+        timesEl.appendChild(row);
+      }
+    });
+  }
+</script>

@@ -1,0 +1,101 @@
+<!-- Ships hidden; only revealed if the client-side fetch succeeds, so an
+     offline visitor or a rate-limited API never sees a broken section. -->
+<div id="gh-activity" class="mt-14 hidden">
+  <h3 class="mb-6 flex items-center gap-3 font-mono text-xs tracking-[0.18em] text-muted uppercase">
+    <span class="text-accent">(+)</span> Live from GitHub <span class="live-dot" aria-hidden="true"></span>
+  </h3>
+  <ol id="gh-list" class="border-t border-white/10"></ol>
+</div>
+
+<script>
+  const wrap = document.getElementById('gh-activity');
+  const list = document.getElementById('gh-list');
+  const USER = 'rasselchioe';
+  const KEY = 'rl-gh-activity';
+  const TTL = 10 * 60 * 1000;
+
+  type Item = { repo: string; msg: string; when: string };
+
+  const timeAgo = (iso: string) => {
+    const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+    if (mins < 60) return `${mins} min ago`;
+    const hours = Math.round(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.round(hours / 24);
+    return days === 1 ? 'yesterday' : `${days} days ago`;
+  };
+
+  async function load(): Promise<Item[]> {
+    try {
+      const cached = sessionStorage.getItem(KEY);
+      if (cached) {
+        const { t, items } = JSON.parse(cached);
+        if (Date.now() - t < TTL && Array.isArray(items)) return items;
+      }
+    } catch {
+      /* cache miss is fine */
+    }
+    const headers = { Accept: 'application/vnd.github+json' };
+    const res = await fetch(`https://api.github.com/users/${USER}/events/public?per_page=30`, { headers });
+    if (!res.ok) return [];
+    const events = await res.json();
+
+    // Unauthenticated event payloads no longer carry the commits array —
+    // only the head SHA — so the message needs one extra lookup per repo.
+    const pushes: { full: string; repo: string; head: string; when: string }[] = [];
+    const seen = new Set<string>();
+    for (const ev of events) {
+      if (ev?.type !== 'PushEvent' || !ev.payload?.head) continue;
+      const full = String(ev.repo?.name ?? '');
+      const repo = full.split('/')[1];
+      if (!repo || seen.has(repo)) continue;
+      seen.add(repo);
+      pushes.push({ full, repo, head: ev.payload.head, when: ev.created_at });
+      if (pushes.length >= 3) break;
+    }
+
+    const items = (
+      await Promise.all(
+        pushes.map(async (p) => {
+          const c = await fetch(`https://api.github.com/repos/${p.full}/commits/${p.head}`, { headers });
+          if (!c.ok) return null;
+          const data = await c.json();
+          const msg = data?.commit?.message?.split('\n')[0];
+          return msg ? { repo: p.repo, msg, when: p.when } : null;
+        }),
+      )
+    ).filter((x): x is Item => x !== null);
+    try {
+      sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), items }));
+    } catch {
+      /* storage unavailable */
+    }
+    return items;
+  }
+
+  if (wrap && list) {
+    load()
+      .then((items) => {
+        if (!items.length) return;
+        for (const item of items) {
+          const li = document.createElement('li');
+          li.className = 'flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-white/10 py-4 font-mono text-xs';
+          const repo = document.createElement('span');
+          repo.className = 'text-accent';
+          repo.textContent = item.repo;
+          const msg = document.createElement('span');
+          msg.className = 'min-w-0 flex-1 truncate text-muted';
+          msg.textContent = item.msg;
+          const when = document.createElement('span');
+          when.className = 'text-[11px] tracking-[0.14em] uppercase text-muted/70';
+          when.textContent = timeAgo(item.when);
+          li.append(repo, msg, when);
+          list.appendChild(li);
+        }
+        wrap.classList.remove('hidden');
+      })
+      .catch(() => {
+        /* stay hidden */
+      });
+  }
+</script>

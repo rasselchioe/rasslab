@@ -17,6 +17,8 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// Regenerate public/og.png from the /og route after design changes (see src/pages/og.astro).
+const ogImage = new URL('/og.png', Astro.site);
 ---
 
 <!doctype html>
@@ -35,11 +37,22 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="rasslab.dev" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Rassel Chioe — Cybersecurity, Software Testing, Full-Stack — rasslab.dev" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
 
     <link rel="preload" href={spaceGroteskUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={jetbrainsMonoUrl} as="font" type="font/woff2" crossorigin />
 
-    <!-- Decide before first paint whether the boot preloader plays. -->
+    <!-- Decide before first paint whether the boot preloader plays.
+         NOTE: this script is whitelisted by sha256 hash in public/_headers —
+         any edit here requires recomputing that hash (command in _headers). -->
     <script is:inline>
       try {
         var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
