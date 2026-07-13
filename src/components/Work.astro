@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import { projects } from '../data/projects';
 import PwDemo from './PwDemo.astro';
 ---
@@ -12,18 +11,12 @@ import PwDemo from './PwDemo.astro';
   <ul class="border-t border-white/10">
     {
       projects.map((p) => (
-        <li class="border-b border-white/10" data-fade data-preview={p.img ? p.n : undefined}>
+        <li class="border-b border-white/10" data-fade>
           <div class="py-8 md:py-10">
             <div class="flex flex-wrap items-baseline gap-x-4 gap-y-3 md:gap-x-8">
               <span class="font-mono text-sm text-accent">({p.n})</span>
               {p.links.length > 0 ? (
-                <a
-                  href={p.links[0].href}
-                  target="_blank"
-                  rel="noopener"
-                  class="group"
-                  data-cursor={p.img ? undefined : 'View ↗'}
-                >
+                <a href={p.links[0].href} target="_blank" rel="noopener" class="group" data-cursor="View ↗">
                   <span class="font-display block text-[1.65rem] leading-none font-bold tracking-tight uppercase transition-[color,translate] duration-300 group-hover:translate-x-2 group-hover:text-accent md:text-6xl">
                     {p.title}
                   </span>
@@ -58,71 +51,4 @@ import PwDemo from './PwDemo.astro';
       ))
     }
   </ul>
-
-  <!-- Cursor-following screenshot, shared by all rows that have an image.
-       Stays display:none unless the script enables it (pointer-fine + motion). -->
-  <div
-    id="work-preview"
-    aria-hidden="true"
-    class="pointer-events-none fixed top-0 left-0 z-40 hidden w-80 overflow-hidden rounded-sm border border-white/15 lg:w-96"
-  >
-    {
-      projects
-        .filter((p) => p.img)
-        .map((p) => (
-          <Image src={p.img!} alt="" widths={[384, 768]} sizes="384px" data-preview-img={p.n} class="hidden w-full" />
-        ))
-    }
-  </div>
 </section>
-
-<script>
-  import gsap from 'gsap';
-
-  const wrap = document.getElementById('work-preview');
-  const rows = document.querySelectorAll<HTMLElement>('li[data-preview]');
-  const fine = window.matchMedia('(pointer: fine)').matches;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (wrap && rows.length && fine && !reduced) {
-    wrap.classList.remove('hidden');
-    gsap.set(wrap, { xPercent: -50, yPercent: -50, autoAlpha: 0, scale: 0.9 });
-
-    const imgs = new Map<string, HTMLElement>();
-    wrap.querySelectorAll<HTMLElement>('[data-preview-img]').forEach((el) => {
-      imgs.set(el.dataset.previewImg ?? '', el);
-    });
-
-    const xTo = gsap.quickTo(wrap, 'x', { duration: 0.35, ease: 'power3.out' });
-    const yTo = gsap.quickTo(wrap, 'y', { duration: 0.35, ease: 'power3.out' });
-    const rTo = gsap.quickTo(wrap, 'rotation', { duration: 0.45, ease: 'power2.out' });
-
-    let lastX = 0;
-    let settle: number | undefined;
-    window.addEventListener(
-      'mousemove',
-      (e) => {
-        xTo(e.clientX);
-        yTo(e.clientY);
-        rTo(gsap.utils.clamp(-9, 9, (e.clientX - lastX) * 0.35));
-        lastX = e.clientX;
-        clearTimeout(settle);
-        settle = window.setTimeout(() => rTo(0), 110);
-      },
-      { passive: true },
-    );
-
-    rows.forEach((row) => {
-      row.addEventListener('mouseenter', (e) => {
-        const id = row.dataset.preview ?? '';
-        imgs.forEach((img, key) => img.classList.toggle('hidden', key !== id));
-        gsap.set(wrap, { x: e.clientX, y: e.clientY });
-        lastX = e.clientX;
-        gsap.to(wrap, { autoAlpha: 1, scale: 1, duration: 0.35, ease: 'power3.out', overwrite: 'auto' });
-      });
-      row.addEventListener('mouseleave', () => {
-        gsap.to(wrap, { autoAlpha: 0, scale: 0.9, duration: 0.3, ease: 'power3.out', overwrite: 'auto' });
-      });
-    });
-  }
-</script>

@@ -1,6 +1,3 @@
-import type { ImageMetadata } from 'astro';
-import stashImg from '../assets/work/stash.png';
-
 export type Project = {
   n: string;
   title: string;
@@ -9,8 +6,6 @@ export type Project = {
   tags: string[];
   links: { label: string; href: string }[];
   note?: string;
-  /** Screenshot shown as a cursor-following preview on hover (desktop only). */
-  img?: ImageMetadata;
   /** Renders the live password-strength demo inside this row. */
   demo?: boolean;
 };
@@ -38,7 +33,6 @@ export const projects: Project[] = [
       { label: 'Live', href: 'https://stash.rasslab.dev' },
       { label: 'GitHub', href: 'https://github.com/rasselchioe/spending-tracker' },
     ],
-    img: stashImg,
   },
   {
     n: '02',
