@@ -2,8 +2,12 @@
 import '../styles/global.css';
 import '@fontsource-variable/space-grotesk';
 import '@fontsource-variable/inter';
+// The default Inter entry ships upright faces only; the headline's italic run
+// needs the real italic axis rather than a synthesised oblique.
+import '@fontsource-variable/inter/wght-italic.css';
 import '@fontsource-variable/jetbrains-mono';
 import spaceGroteskUrl from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+import interUrl from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
 import jetbrainsMonoUrl from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 
 interface Props {
@@ -48,19 +52,23 @@ const ogImage = new URL('/og.png', Astro.site);
     <meta name="twitter:image" content={ogImage} />
 
     <link rel="preload" href={spaceGroteskUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={interUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={jetbrainsMonoUrl} as="font" type="font/woff2" crossorigin />
 
-    <!-- Decide before first paint whether the boot preloader plays.
+    <!-- Resolve the theme before first paint so there is no flash of the wrong
+         canvas. Absent data-theme = dark.
          NOTE: this script is whitelisted by sha256 hash in public/_headers —
          any edit here requires recomputing that hash (command in _headers). -->
     <script is:inline>
       try {
-        var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var seen = sessionStorage.getItem('rl-booted');
-        document.documentElement.dataset.boot = !reduced && !seen ? 'play' : 'skip';
-      } catch (e) {
-        document.documentElement.dataset.boot = 'skip';
-      }
+        var stored = localStorage.getItem('rl-theme');
+        var light = stored === 'light' || (!stored && matchMedia('(prefers-color-scheme: light)').matches);
+        if (light) {
+          document.documentElement.dataset.theme = 'light';
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.content = '#f4f4f1';
+        }
+      } catch (e) {}
     </script>
   </head>
   <body>
@@ -71,8 +79,5 @@ const ogImage = new URL('/og.png', Astro.site);
       Skip to content
     </a>
     <slot />
-    <script>
-      import '../scripts/motion';
-    </script>
   </body>
 </html>

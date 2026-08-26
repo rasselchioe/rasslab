@@ -1,0 +1,33 @@
+<button
+  type="button"
+  data-theme-toggle
+  aria-label="Toggle theme"
+  class="fixed top-7 right-8 z-50 grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-faint bg-transparent text-muted transition-colors duration-200 hover:border-accent hover:text-accent"
+>
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.8 6.8 0 0 0 9.8 9.8Z"></path>
+  </svg>
+</button>
+
+<script>
+  // The initial theme is resolved before first paint by the inline boot script
+  // in Base.astro; this only handles the flip.
+  const CANVAS = { light: '#f4f4f1', dark: '#0a0a0a' };
+
+  document.querySelector<HTMLButtonElement>('[data-theme-toggle]')?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const light = root.dataset.theme !== 'light';
+
+    if (light) root.dataset.theme = 'light';
+    else delete root.dataset.theme;
+
+    try {
+      localStorage.setItem('rl-theme', light ? 'light' : 'dark');
+    } catch {
+      /* storage unavailable — the choice just won't survive a reload */
+    }
+
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (meta) meta.content = light ? CANVAS.light : CANVAS.dark;
+  });
+</script>

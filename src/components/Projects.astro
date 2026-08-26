@@ -1,0 +1,49 @@
+---
+import { projects } from '../data/projects';
+import Heatmap from './Heatmap.astro';
+
+const rows = projects.map((p) => ({
+  n: p.n,
+  title: p.title,
+  sub: p.sub,
+  meta: p.links.map((l) => l.label).join(' · ') || (p.note ? 'Private' : ''),
+  href: p.links[0]?.href,
+}));
+---
+
+<section class="mt-10">
+  <h2 class="font-mono text-[11px] font-normal tracking-[0.16em] text-muted uppercase">Projects</h2>
+
+  <Heatmap />
+
+  <div class="mt-[22px] flex flex-col">
+    {
+      rows.map((r) => {
+        const inner = (
+          <>
+            <span class="font-mono text-[12px] text-muted">{r.n}</span>
+            <span class="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+              <span class="font-display text-[16px] font-medium text-ink">{r.title}</span>
+              <span class="text-[14px] text-muted">{r.sub}</span>
+            </span>
+            <span class="font-mono text-[11px] tracking-[0.08em] whitespace-nowrap text-muted">
+              {r.meta}
+            </span>
+          </>
+        );
+        const cls =
+          '-mx-3 grid grid-cols-[34px_1fr_auto] items-baseline gap-4 rounded-lg px-3 py-[14px] transition-colors duration-200 hover:bg-panel';
+
+        // The photography portfolio is a private repo — a row with nowhere to
+        // go is not a link.
+        return r.href ? (
+          <a class={cls} href={r.href} target="_blank" rel="noopener">
+            {inner}
+          </a>
+        ) : (
+          <div class={cls}>{inner}</div>
+        );
+      })
+    }
+  </div>
+</section>

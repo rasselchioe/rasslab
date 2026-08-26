@@ -1,0 +1,44 @@
+---
+// Shared by Experiences and Education — identical rows, different headings.
+export type Row = {
+  /** Two-letter monogram for the tile. */
+  mark: string;
+  primary: string;
+  secondary: string;
+  meta: string;
+};
+
+interface Props {
+  heading: string;
+  rows: Row[];
+  class?: string;
+}
+
+const { heading, rows, class: className } = Astro.props;
+---
+
+<section class:list={['mt-[52px]', className]}>
+  <h2 class="font-mono text-[11px] font-normal tracking-[0.16em] text-muted uppercase">{heading}</h2>
+
+  <div class="mt-[22px] flex flex-col">
+    {
+      rows.map((r) => (
+        <div class="-mx-3 grid grid-cols-[28px_1fr_auto] items-center gap-4 rounded-lg p-3 transition-colors duration-200 hover:bg-panel">
+          <span
+            class="grid h-7 w-7 place-items-center rounded-[7px] border border-faint bg-panel font-mono text-[10.5px] tracking-[0.02em] text-muted"
+            aria-hidden="true"
+          >
+            {r.mark}
+          </span>
+          <span class="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+            <span class="text-[15px] font-medium text-ink">{r.primary}</span>
+            <span class="text-[14px] text-muted">{r.secondary}</span>
+          </span>
+          <span class="font-mono text-[11px] tracking-[0.08em] whitespace-nowrap text-muted">
+            {r.meta}
+          </span>
+        </div>
+      ))
+    }
+  </div>
+</section>

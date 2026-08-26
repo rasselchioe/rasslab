@@ -1,26 +1,58 @@
 ---
 import Base from '../layouts/Base.astro';
-import Preloader from '../components/Preloader.astro';
-import Header from '../components/Header.astro';
-import Hero from '../components/Hero.astro';
-import About from '../components/About.astro';
-import Skills from '../components/Skills.astro';
-import Work from '../components/Work.astro';
-import Experience from '../components/Experience.astro';
-import Contact from '../components/Contact.astro';
-import Terminal from '../components/Terminal.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Intro from '../components/Intro.astro';
+import Projects from '../components/Projects.astro';
+import RowList from '../components/RowList.astro';
+import Stack from '../components/Stack.astro';
+import Now from '../components/Now.astro';
+import SocialBar from '../components/SocialBar.astro';
+
+const experiences = [
+  { mark: 'PL', primary: 'Finance Team Member', secondary: 'PPI Liverpool', meta: 'Current' },
+  {
+    mark: 'IL',
+    primary: 'Assistant Photography Intern',
+    secondary: 'ILUMINEN, Bali',
+    meta: '2022 — 2024',
+  },
+  {
+    mark: 'MC',
+    primary: 'Information Technology Intern',
+    secondary: 'Murni Cosmetics, Bali',
+    meta: 'Dec 2022',
+  },
+  {
+    mark: 'RS',
+    primary: 'Production House Documentation',
+    secondary: 'Regents School, Bali',
+    meta: '2022 — 2023',
+  },
+];
+
+const education = [
+  {
+    mark: 'UL',
+    primary: 'BSc Computer Science (Year in Industry)',
+    secondary: 'University of Liverpool',
+    meta: '2024 — 2028',
+  },
+];
 ---
 
 <Base>
-  <Preloader />
-  <Header />
-  <main id="main">
-    <Hero />
-    <About />
-    <Skills />
-    <Work />
-    <Experience />
-    <Contact />
-  </main>
-  <Terminal />
+  <div class="relative min-h-screen px-6 pb-7">
+    <ThemeToggle />
+
+    <main id="main" class="mx-auto max-w-[680px] pt-28">
+      <Intro />
+      <Projects />
+      <RowList heading="Experiences" rows={experiences} />
+      <RowList heading="Education" rows={education} />
+      <Stack />
+      <Now />
+    </main>
+
+    <SocialBar />
+  </div>
 </Base>
