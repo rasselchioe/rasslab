@@ -4,11 +4,11 @@
 #   node -e "const m=require('fs').readFileSync('dist/index.html','utf8').match(/<script>([\s\S]*?)<\/script>/);console.log('sha256-'+require('crypto').createHash('sha256').update(m[1],'utf8').digest('base64'))"
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-Pbl3i9wC/ja408ctt9V/mOlF1wrS+D1PqEbvf97m7zI='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-Pbl3i9wC/ja408ctt9V/mOlF1wrS+D1PqEbvf97m7zI='; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), display-capture=(), midi=()
   Cross-Origin-Opener-Policy: same-origin
   X-Hire-Me: rasselchioe@gmail.com - yes, this header is intentional
