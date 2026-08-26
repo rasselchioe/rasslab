@@ -226,6 +226,39 @@ h2[data-reveal].is-revealed {
    Scoped to a:hover rather than a group-hover utility, which excludes the one
    row that is a <div> because it has nowhere to link to. */
 
+/* ---------- project rows ----------
+   Each destination is its own link so "Live · GitHub" is two targets, not one
+   ambiguous label. The title's link is stretched across the row to keep the
+   design's click-anywhere behaviour; the meta links sit above it and win. */
+
+.project-row {
+  position: relative;
+}
+.row-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+}
+/* Colour set explicitly: the base `a { color: var(--ink) }` rule targets the
+   anchor directly and so beats the muted colour inherited from the row. */
+.meta-link {
+  position: relative;
+  z-index: 1;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+.meta-link:hover {
+  color: var(--accent);
+}
+/* Separator as generated content, so no whitespace-only text node for Astro's
+   compressHTML to trim. Explicit colour keeps it muted when the link hovers. */
+.meta-link + .meta-link::before {
+  content: '·';
+  margin: 0 0.5em;
+  color: var(--muted);
+}
+
 .row-num {
   position: relative;
   display: block;
@@ -241,10 +274,12 @@ h2[data-reveal].is-revealed {
   inset: 0;
   transform: translateY(100%);
 }
-a:hover .row-num .row-num-face {
+/* Hover the whole row, not just the anchor — the row is a <div> now. `.is-link`
+   keeps the arrow off the one row that has nowhere to go. */
+.project-row.is-link:hover .row-num-face {
   transform: translateY(-100%);
 }
-a:hover .row-num .row-num-alt {
+.project-row.is-link:hover .row-num-alt {
   transform: translateY(0);
 }
 

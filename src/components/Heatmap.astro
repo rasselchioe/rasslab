@@ -4,7 +4,6 @@ import { getContributions } from '../lib/contributions';
 // Build-time only. Returns null without a GITHUB_TOKEN, or if GitHub is
 // unreachable — in which case the card is dropped rather than faked.
 const data = await getContributions();
-const legend = [0, 1, 2, 3, 4];
 
 // Only lit cells pop: with a sparse calendar, animating the empty ones would
 // spend the whole reveal drawing the eye across nothing.
@@ -41,16 +40,9 @@ const bucket = (i: number) =>
         )}
       </div>
 
-      <div class="mt-3 flex items-center justify-between gap-4 font-mono text-[10px] tracking-[0.08em] text-muted">
-        <span>{data.total.toLocaleString('en-GB')} CONTRIBUTIONS IN THE LAST YEAR</span>
-        <span class="flex items-center gap-1.5">
-          <span>LESS</span>
-          {legend.map((l) => (
-            <span class={`hm-cell hm-${l}`} aria-hidden="true" />
-          ))}
-          <span>MORE</span>
-        </span>
-      </div>
+      <p class="mt-3 font-mono text-[10px] tracking-[0.08em] text-muted">
+        {data.total.toLocaleString('en-GB')} CONTRIBUTIONS IN THE LAST YEAR
+      </p>
     </div>
   )
 }
