@@ -84,6 +84,49 @@ function postGraphQL(token: string, body: string): Promise<string | null> {
   });
 }
 
+type Calendar = { totalContributions: number; weeks: { contributionDays: Day[] }[] };
+
+/**
+ * GitHub's GraphQL replicas disagree: three back-to-back reads returned 125,
+ * 120 and 121 for the same calendar. Replicas that lag are missing the most
+ * recent contributions, so they under-report — the highest total is the
+ * freshest view. Take the whole winning calendar, not just its number, so the
+ * cells and the total always come from the same response.
+ */
+const SAMPLES = 3;
+
+function parseCalendar(raw: string | null): Calendar | null {
+  if (!raw) return null;
+  try {
+    const cal = JSON.parse(raw)?.data?.user?.contributionsCollection?.contributionCalendar;
+    return cal?.weeks?.length ? cal : null;
+  } catch {
+    return null;
+  }
+}
+
+function toCells(weeks: { contributionDays: Day[] }[]): HeatmapCell[] {
+  const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const cells: HeatmapCell[] = [];
+
+  // The calendar's first week is partial. The grid flows down each column over
+  // seven fixed rows, so a short first column would pull every later week up
+  // with it — pad the missing days out instead.
+  const lead = 7 - (weeks[0]?.contributionDays.length ?? 7);
+  for (let i = 0; i < lead; i++) cells.push({ level: 0, label: null });
+
+  for (const week of weeks) {
+    for (const day of week.contributionDays) {
+      const n = day.contributionCount;
+      cells.push({
+        level: LEVELS[day.contributionLevel] ?? 0,
+        label: `${n} contribution${n === 1 ? '' : 's'} · ${fmt.format(new Date(day.date))}`,
+      });
+    }
+  }
+  return cells;
+}
+
 export async function getContributions(): Promise<Contributions | null> {
   // Vite exposes .env files; a shell-exported variable only reaches process.env.
   const token =
@@ -93,38 +136,17 @@ export async function getContributions(): Promise<Contributions | null> {
   if (!token) return null;
 
   try {
-    const raw = await postGraphQL(token, JSON.stringify({ query: QUERY, variables: { login: LOGIN } }));
-    if (!raw) return null;
+    const body = JSON.stringify({ query: QUERY, variables: { login: LOGIN } });
+    const samples = await Promise.all(Array.from({ length: SAMPLES }, () => postGraphQL(token, body)));
 
-    const json = JSON.parse(raw);
-    const calendar = json?.data?.user?.contributionsCollection?.contributionCalendar;
-    const weeks: { contributionDays: Day[] }[] = calendar?.weeks ?? [];
-    if (!weeks.length) return null;
-
-    const fmt = new Intl.DateTimeFormat('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-    const cells: HeatmapCell[] = [];
-
-    // The calendar's first week is partial. The grid flows down each column
-    // over seven fixed rows, so a short first column would pull every later
-    // week up with it — pad the missing days out instead.
-    const lead = 7 - (weeks[0]?.contributionDays.length ?? 7);
-    for (let i = 0; i < lead; i++) cells.push({ level: 0, label: null });
-
-    for (const week of weeks) {
-      for (const day of week.contributionDays) {
-        const n = day.contributionCount;
-        cells.push({
-          level: LEVELS[day.contributionLevel] ?? 0,
-          label: `${n} contribution${n === 1 ? '' : 's'} · ${fmt.format(new Date(day.date))}`,
-        });
-      }
+    let freshest: Calendar | null = null;
+    for (const raw of samples) {
+      const cal = parseCalendar(raw);
+      if (cal && (!freshest || cal.totalContributions > freshest.totalContributions)) freshest = cal;
     }
+    if (!freshest) return null;
 
-    return { total: calendar.totalContributions ?? 0, cells };
+    return { total: freshest.totalContributions ?? 0, cells: toCells(freshest.weeks) };
   } catch {
     // Offline, rate-limited, bad token — the build carries on without the card.
     return null;
