@@ -21,7 +21,10 @@
   --ink: #f2f2ef;
   --muted: #8a8a86;
   --faint: rgba(242, 242, 239, 0.1);
-  --accent: #5eead4;
+  --accent: #f2f2ef;
+  /* The contribution graph keeps the mint — it is the one place colour still
+     carries meaning, so it gets its own token rather than riding on --accent. */
+  --heat: #5eead4;
   color-scheme: dark;
 }
 
@@ -31,7 +34,8 @@
   --ink: #141413;
   --muted: #6f6f6a;
   --faint: rgba(20, 20, 19, 0.12);
-  --accent: #0f9b86;
+  --accent: #141413;
+  --heat: #0f9b86;
   color-scheme: light;
 }
 
@@ -96,7 +100,7 @@ a {
   width: 9px;
   height: 9px;
   border-radius: 2px;
-  background: var(--accent);
+  background: var(--heat);
 }
 .hm-0 { opacity: 0.07; }
 .hm-1 { opacity: 0.28; }
