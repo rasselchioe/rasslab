@@ -64,27 +64,7 @@ a {
   border-radius: 2px;
 }
 
-/* ---------- typographic motifs (still used by the /og card) ---------- */
-
-.text-outline {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--ink);
-}
-@supports not (-webkit-text-stroke: 1px red) {
-  .text-outline {
-    color: var(--ink);
-  }
-}
-
-.text-outline-faint {
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(242, 242, 239, 0.16);
-}
-@supports not (-webkit-text-stroke: 1px red) {
-  .text-outline-faint {
-    color: rgba(242, 242, 239, 0.08);
-  }
-}
+/* ---------- link hover ---------- */
 
 .link-hover {
   transition: color 0.2s ease;
@@ -221,10 +201,6 @@ h2[data-reveal].is-revealed {
   opacity: 1;
   transform: none;
 }
-
-/* ---------- project row number → arrow ----------
-   Scoped to a:hover rather than a group-hover utility, which excludes the one
-   row that is a <div> because it has nowhere to link to. */
 
 /* ---------- project rows ----------
    Each destination is its own link so "Live · GitHub" is two targets, not one
