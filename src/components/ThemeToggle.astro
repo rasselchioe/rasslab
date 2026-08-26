@@ -4,8 +4,22 @@
   aria-label="Toggle theme"
   class="fixed top-7 right-8 z-50 grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-faint bg-transparent text-muted transition-colors duration-200 hover:border-accent hover:text-accent"
 >
-  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.8 6.8 0 0 0 9.8 9.8Z"></path>
+  </svg>
+  <svg
+    class="icon-sun"
+    width="17"
+    height="17"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4.2"></circle>
+    <path d="M12 2.4v2.3M12 19.3v2.3M4.2 12H1.9M22.1 12h-2.3M6.5 6.5 4.9 4.9M19.1 19.1l-1.6-1.6M17.5 6.5l1.6-1.6M4.9 19.1l1.6-1.6"></path>
   </svg>
 </button>
 
@@ -13,21 +27,31 @@
   // The initial theme is resolved before first paint by the inline boot script
   // in Base.astro; this only handles the flip.
   const CANVAS = { light: '#f4f4f1', dark: '#0a0a0a' };
+  const btn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
 
-  document.querySelector<HTMLButtonElement>('[data-theme-toggle]')?.addEventListener('click', () => {
-    const root = document.documentElement;
-    const light = root.dataset.theme !== 'light';
+  // Say what the button will do, not just that it toggles something.
+  const label = (light: boolean) => `Switch to ${light ? 'dark' : 'light'} theme`;
 
-    if (light) root.dataset.theme = 'light';
-    else delete root.dataset.theme;
+  if (btn) {
+    btn.setAttribute('aria-label', label(document.documentElement.dataset.theme === 'light'));
 
-    try {
-      localStorage.setItem('rl-theme', light ? 'light' : 'dark');
-    } catch {
-      /* storage unavailable — the choice just won't survive a reload */
-    }
+    btn.addEventListener('click', () => {
+      const root = document.documentElement;
+      const light = root.dataset.theme !== 'light';
 
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    if (meta) meta.content = light ? CANVAS.light : CANVAS.dark;
-  });
+      if (light) root.dataset.theme = 'light';
+      else delete root.dataset.theme;
+
+      btn.setAttribute('aria-label', label(light));
+
+      try {
+        localStorage.setItem('rl-theme', light ? 'light' : 'dark');
+      } catch {
+        /* storage unavailable — the choice just won't survive a reload */
+      }
+
+      const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+      if (meta) meta.content = light ? CANVAS.light : CANVAS.dark;
+    });
+  }
 </script>

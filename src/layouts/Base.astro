@@ -56,10 +56,13 @@ const ogImage = new URL('/og.png', Astro.site);
     <link rel="preload" href={jetbrainsMonoUrl} as="font" type="font/woff2" crossorigin />
 
     <!-- Resolve the theme before first paint so there is no flash of the wrong
-         canvas. Absent data-theme = dark.
+         canvas. Absent data-theme = dark. Also flags that scripting is live, so
+         the entrance animation may hide its start state — without JS the intro
+         must render immediately rather than wait for an animation.
          NOTE: this script is whitelisted by sha256 hash in public/_headers —
          any edit here requires recomputing that hash (command in _headers). -->
     <script is:inline>
+      document.documentElement.dataset.motion = 'on';
       try {
         var stored = localStorage.getItem('rl-theme');
         var light = stored === 'light' || (!stored && matchMedia('(prefers-color-scheme: light)').matches);

@@ -12,7 +12,7 @@ const rows = projects.map((p) => ({
 ---
 
 <section class="mt-10">
-  <h2 class="font-mono text-[11px] font-normal tracking-[0.16em] text-muted uppercase">Projects</h2>
+  <h2 data-reveal class="font-mono text-[11px] font-normal tracking-[0.16em] text-muted uppercase">Projects</h2>
 
   <Heatmap />
 
@@ -21,7 +21,12 @@ const rows = projects.map((p) => ({
       rows.map((r) => {
         const inner = (
           <>
-            <span class="font-mono text-[12px] text-muted">{r.n}</span>
+            <span class="row-num font-mono text-[12px] text-muted">
+              <span class="row-num-face">{r.n}</span>
+              <span class="row-num-alt" aria-hidden="true">
+                ↗
+              </span>
+            </span>
             <span class="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
               <span class="font-display text-[16px] font-medium text-ink">{r.title}</span>
               <span class="text-[14px] text-muted">{r.sub}</span>

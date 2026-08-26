@@ -127,6 +127,127 @@ a {
    rhythm without drawing anything. */
 .hm-pad { opacity: 0; }
 
+/* ---------- entrance motion ----------
+   Rule for everything below: the default state is the FINISHED state, and the
+   animation runs from the start state. If the observer never fires — JS off,
+   script blocked, no IntersectionObserver — the page still reads correctly. */
+
+@keyframes rl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Opening column: above the fold, so this runs on load with no observer.
+   Gated on data-motion, which the pre-paint script in Base.astro sets only when
+   scripting is live. This animation is the one place where the start state is
+   hidden, so without the gate a visitor with JS disabled gets a blank first
+   screen — the headline and the whole bio — if the animation never runs. */
+:root[data-motion='on'] .rise {
+  animation: rl-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.rise-1 { animation-delay: 0.05s; }
+.rise-2 { animation-delay: 0.11s; }
+.rise-3 { animation-delay: 0.17s; }
+.rise-4 { animation-delay: 0.23s; }
+
+/* Section headings tighten their tracking as they arrive. The settled 0.16em
+   is the default in the markup; this only animates in from wider. */
+@keyframes rl-track {
+  from {
+    opacity: 0;
+    letter-spacing: 0.24em;
+  }
+}
+h2[data-reveal].is-revealed {
+  animation: rl-track 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ---------- heatmap reveal ----------
+   The card fades in flat, then only the lit cells pop. Deliberately scale-only:
+   .hm-0….hm-4 encode the contribution level AS opacity, so animating opacity
+   here would fight the data. The flat fade lives on the grid container. */
+
+@keyframes rl-grid-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rl-pop {
+  from {
+    transform: scale(0.6);
+  }
+}
+
+.hm-grid.is-revealed {
+  animation: rl-grid-in 0.2s ease both;
+}
+.hm-grid.is-revealed .hm-cell[class*='hm-p'] {
+  animation: rl-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Eight delay buckets across the ~53 columns, so the pops read left to right.
+   Offset past the 0.2s grid fade. Delays have to be classes, not inline
+   styles — style-src is 'self'. */
+.hm-p0 { animation-delay: 0.2s; }
+.hm-p1 { animation-delay: 0.24s; }
+.hm-p2 { animation-delay: 0.28s; }
+.hm-p3 { animation-delay: 0.32s; }
+.hm-p4 { animation-delay: 0.36s; }
+.hm-p5 { animation-delay: 0.4s; }
+.hm-p6 { animation-delay: 0.44s; }
+.hm-p7 { animation-delay: 0.48s; }
+
+/* ---------- theme toggle icon ----------
+   Moon in dark, sun in light. Both occupy the same grid cell and cross-fade. */
+
+.icon-moon,
+.icon-sun {
+  grid-area: 1 / 1;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.icon-sun {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+}
+:root[data-theme='light'] .icon-moon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+}
+:root[data-theme='light'] .icon-sun {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- project row number → arrow ----------
+   Scoped to a:hover rather than a group-hover utility, which excludes the one
+   row that is a <div> because it has nowhere to link to. */
+
+.row-num {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: 1.25em;
+}
+.row-num > span {
+  display: block;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.row-num .row-num-alt {
+  position: absolute;
+  inset: 0;
+  transform: translateY(100%);
+}
+a:hover .row-num .row-num-face {
+  transform: translateY(-100%);
+}
+a:hover .row-num .row-num-alt {
+  transform: translateY(0);
+}
+
 /* ---------- social bar: floats as a pill, settles into a footer row ----------
    Every animated value is a custom property on the bar, inherited by the links
    and labels, so one attribute flip drives the whole transition. Only
