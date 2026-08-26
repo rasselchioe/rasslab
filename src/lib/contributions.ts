@@ -1,3 +1,5 @@
+import https from 'node:https';
+
 /**
  * GitHub contribution calendar, fetched once at build time.
  *
@@ -39,6 +41,49 @@ const QUERY = `query ($login: String!) {
 
 type Day = { date: string; contributionCount: number; contributionLevel: string };
 
+/**
+ * Deliberately node:https rather than fetch. Node's fetch pools its socket, and
+ * a pooled socket outliving the build makes `astro build` abort on teardown
+ * with exit 127 — which silently skips `wrangler deploy` in the deploy script.
+ * keepAlive:false closes the connection as soon as the response is read.
+ */
+function postGraphQL(token: string, body: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    const req = https.request(
+      {
+        hostname: 'api.github.com',
+        path: '/graphql',
+        method: 'POST',
+        agent: new https.Agent({ keepAlive: false }),
+        timeout: 8000,
+        headers: {
+          Authorization: `bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Content-Length': new TextEncoder().encode(body).length,
+          'User-Agent': 'rasslab.dev build',
+        },
+      },
+      (res) => {
+        if (res.statusCode !== 200) {
+          res.resume();
+          resolve(null);
+          return;
+        }
+        let data = '';
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => resolve(data));
+      },
+    );
+    req.on('error', () => resolve(null));
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(null);
+    });
+    req.end(body);
+  });
+}
+
 export async function getContributions(): Promise<Contributions | null> {
   // Vite exposes .env files; a shell-exported variable only reaches process.env.
   const token =
@@ -48,19 +93,10 @@ export async function getContributions(): Promise<Contributions | null> {
   if (!token) return null;
 
   try {
-    const res = await fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: {
-        Authorization: `bearer ${token}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'rasslab.dev build',
-      },
-      body: JSON.stringify({ query: QUERY, variables: { login: LOGIN } }),
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) return null;
+    const raw = await postGraphQL(token, JSON.stringify({ query: QUERY, variables: { login: LOGIN } }));
+    if (!raw) return null;
 
-    const json = await res.json();
+    const json = JSON.parse(raw);
     const calendar = json?.data?.user?.contributionsCollection?.contributionCalendar;
     const weeks: { contributionDays: Day[] }[] = calendar?.weeks ?? [];
     if (!weeks.length) return null;
